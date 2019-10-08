@@ -41,7 +41,7 @@ export class Api {
    */
   async login(email, password) {
     // make the api call
-    const response = await this.apisauce.get(`/login.json`, {
+    const response = await this.apisauce.get(`/login.json?debug=1`, {
       email,
       password
     })
@@ -74,8 +74,6 @@ export class Api {
 
     // transform the data into the format we are expecting
     try {
-      console.log(response)
-
       return { kind: 'ok' }
     } catch {
       return { kind: 'bad-data' }
@@ -87,7 +85,7 @@ export class Api {
    */
   async getAllAccounts(session) {
     // make the api call
-    const response = await this.apisauce.get(`/get-my-accounts.json`, {
+    const response = await this.apisauce.get(`/get-my-accounts.json?debug=1`, {
       session
     })
 
@@ -110,7 +108,9 @@ export class Api {
    */
   async getOpenTrades(session, id) {
     // make the api call
-    const response = await this.apisauce.get(`/get-open-trades.json?session=${session}&id=${id}`)
+    const response = await this.apisauce.get(
+      `/get-open-trades.json?debug=1&session=${session}&id=${id}`
+    )
 
     if (!response.ok) {
       return { kind: 'error' }
@@ -134,7 +134,7 @@ export class Api {
   async getWeekGain(session, id, start, end) {
     // make the api call
     const response = await this.apisauce.get(
-      `/get-gain.json?session=${session}&id=${id}&start=${start}&end=${end}`
+      `/get-gain.json?debug=1&session=${session}&id=${id}&start=${start}&end=${end}`
     )
 
     if (!response.ok) {
@@ -143,8 +143,6 @@ export class Api {
 
     // transform the data into the format we are expecting
     try {
-      console.log(response)
-
       return { kind: 'ok', gain: response.data.value }
     } catch {
       return { kind: 'bad-data' }
