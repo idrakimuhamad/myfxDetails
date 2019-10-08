@@ -2,7 +2,7 @@ import { AppLoading } from 'expo'
 import { Asset } from 'expo-asset'
 import * as Font from 'expo-font'
 import React, { useState, useEffect } from 'react'
-import { Platform, StatusBar, StyleSheet, View, AsyncStorage } from 'react-native'
+import { Alert, Platform, StatusBar, StyleSheet, View, AsyncStorage } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 
 import AppNavigator from './navigation/AppNavigator'
@@ -24,63 +24,71 @@ export default function App(props) {
   }
 
   async function getSession() {
-    console.tron.log('Retrieving session...')
+    console.log('Retrieving session...')
     try {
       const value = await AsyncStorage.getItem('myfxSession')
       if (value !== null) {
         // set the session to state
-        console.tron.log(`Session received...${value}`)
+        console.log(`Session received...${value}`)
         setSession(value)
       } else {
-        console.tron.log('No session in storage...')
+        console.log('No session in storage...')
       }
     } catch (error) {
       // Error retrieving data
-      console.tron.error(`Unable to retrieve session: ${error.message}`)
+      console.error(`Unable to retrieve session: ${error.message}`)
     }
   }
 
   async function storeSession(sessionId) {
-    console.tron.log('Storing session...')
+    console.log('Storing session...')
     try {
       await AsyncStorage.setItem('myfxSession', sessionId)
       getSession()
     } catch (error) {
-      console.tron.error(`Unable to save the session: ${error.message}`)
+      console.error(`Unable to save the session: ${error.message}`)
     }
   }
 
   async function removeSession() {
-    console.tron.log('Clearing session...')
+    console.log('Clearing session...')
     try {
-      console.tron.log('Done...')
+      console.log('Done...')
       await AsyncStorage.removeItem('myfxSession')
     } catch (error) {
-      console.tron.error(`Unable to clear the session: ${error.message}`)
+      console.error(`Unable to clear the session: ${error.message}`)
     }
   }
 
-  async function handleLogin() {
-    console.tron.log('Logging in...')
+  const handleLogin = async () => {
+    console.log('Logging in...')
+    Alert.alert('handle login')
 
     const request = await apiContext.login('idrakimuhamad@gmail.com', 'atin2309')
 
     if (request.kind === 'ok') {
-      console.tron.log(`Logged in... Session ${request.session}`)
+      Alert.alert('Login OK')
+      console.log(`Logged in... Session ${request.session}`)
       storeSession(request.session)
+    } else {
+      Alert.alert('Login not ok')
     }
   }
 
   async function handleLogout() {
-    console.tron.log('Logging out..')
+    console.log('Logging out..')
 
     const request = await apiContext.logout(session)
 
     if (request.kind === 'ok') {
-      console.tron.log(`Logged out...`)
+      console.log(`Logged out...`)
       setSession('')
       removeSession()
     }
+  }
+
+  const doSomething = async () => {
+    Alert.alert('Do something')
   }
 
   useEffect(() => {

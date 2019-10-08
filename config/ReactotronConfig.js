@@ -2,6 +2,8 @@ import { AsyncStorage } from 'react-native'
 import Reactotron, { asyncStorage } from 'reactotron-react-native'
 import apisaucePlugin from 'reactotron-apisauce'
 
+Reactotron.clear()
+
 Reactotron.setAsyncStorageHandler(AsyncStorage)
   .configure({
     name: 'MyFxDetails'

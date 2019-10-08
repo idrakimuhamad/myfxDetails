@@ -30,6 +30,8 @@
     "react-navigation": "^3.12.0"
   },
   "devDependencies": {
+    "babel-plugin-ignite-ignore-reactotron": "^0.3.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "^7.0.0",
     "jest-expo": "^35.0.0",
     "reactotron-apisauce": "^3.0.0",

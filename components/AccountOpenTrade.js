@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import dayjs from 'dayjs'
 import 'dayjs/locale/en-SG'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import Colors from '../constants/Colors'
+
+dayjs.extend(relativeTime)
 
 export default function AccountOpenTrade({
   api,
@@ -33,10 +37,16 @@ export default function AccountOpenTrade({
   }
 
   const calculateTotalPL = () => {
+    if (!trades.length) return <Text style={styles.float}>0.00 {currency}</Text>
     const total = trades.reduce((m, trade) => m + trade.profit, 0)
     return (
-      <Text>
-        {total} {currency}
+      <Text
+        style={{
+          ...styles.float,
+          color: total < 0 ? Colors.danger : Colors.success
+        }}>
+        {total > 0 ? '+' : ''}
+        {total.toFixed(2)} {currency}
       </Text>
     )
   }
@@ -51,14 +61,6 @@ export default function AccountOpenTrade({
       const endOfWeek = dayjs()
         .endOf('week')
         .format('YYYY-MM-DD')
-      // const startOfWeek =
-      //   todayInNumber > 0
-      //     ? today.subtract(todayInNumber - (todayInNumber - 1), 'day').format('YYYY-MM-DD')
-      //     : today.subtract(6, 'day').format('YYYY-MM-DD')
-      // const endOfWeek =
-      //   todayInNumber > 0
-      //     ? today.add(7 - todayInNumber, 'day').format('YYYY-MM-DD')
-      //     : today.format('YYYY-MM-DD')
 
       const request = await api.getWeekGain(session, id, startOfWeek, endOfWeek)
 
@@ -75,26 +77,72 @@ export default function AccountOpenTrade({
   }, [session, id])
 
   return (
-    <View>
-      <Text>{name}</Text>
-      <View>
-        {!trades.length ? (
-          <Text>No open trade.</Text>
-        ) : (
-          <Text>Current float: {calculateTotalPL()}</Text>
-        )}
-        <View>
-          <Text>
-            Balance: {balance} {currency}
+    <View style={styles.accountCard}>
+      <View style={styles.accountCardInner}>
+        <View
+          style={styles.cardRow}
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="flex-start">
+          <Text style={styles.accountName} numberOfLines={1}>
+            {name}
           </Text>
-          <Text>
-            Equity: {equity} {currency}
+          <View style={styles.cardRight} alignItems="flex-end">
+            {calculateTotalPL()}
+          </View>
+        </View>
+        <View
+          style={styles.cardRow}
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="flex-start">
+          <Text style={styles.balance}>Balance / Equity</Text>
+          <Text style={styles.balance}>
+            {balance} / {equity} {currency}
           </Text>
-          <Text>
-            Total Profit: {profit} {currency}
+        </View>
+        <View
+          style={styles.cardRow}
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="flex-start">
+          <Text style={styles.balance}>Profit</Text>
+          <Text
+            style={{
+              ...styles.balance,
+              color:
+                parseFloat(profit) >= 1
+                  ? Colors.success
+                  : parseFloat(profit) < 0
+                  ? Colors.danger
+                  : 'rgba(255,255,255, .25)'
+            }}>
+            {parseFloat(profit) > 0 ? '+' : ''}
+            {profit} {currency}
           </Text>
-          <Text>This week gain: {weeklyGain.toFixed(2)} %</Text>
-          <Text>Updated on: {lastUpdateDate}</Text>
+        </View>
+        <View
+          style={styles.cardRow}
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="flex-start">
+          <Text style={styles.balance}>Week's gain</Text>
+          <Text
+            style={{
+              ...styles.balance,
+              color:
+                weeklyGain >= 1
+                  ? Colors.success
+                  : weeklyGain < 0
+                  ? Colors.danger
+                  : 'rgba(255,255,255, .25)'
+            }}>
+            {weeklyGain > 0 ? '+' : ''}
+            {weeklyGain.toFixed(2)} %
+          </Text>
+        </View>
+        <View style={styles.updateTimeContainer}>
+          <Text style={styles.updateTimeText}>Updated {dayjs(lastUpdateDate).fromNow()}</Text>
         </View>
       </View>
     </View>
@@ -102,90 +150,40 @@ export default function AccountOpenTrade({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff'
+  accountCard: {
+    paddingBottom: 12
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
+  accountCardInner: {
+    backgroundColor: 'rgba(255,255,255, .025)',
+    borderRadius: 4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(0,0,0, .15)',
+    padding: 16
+  },
+  accountName: {
+    flex: 0.5,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'rgba(255,255,255, .7)'
+  },
+  float: {
+    fontSize: 20,
+    color: 'rgba(255,255,255, .25)'
+  },
+  cardRow: {
+    paddingVertical: 4
+  },
+  cardRight: {
+    flex: 0.5
+  },
+  balance: {
     fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center'
+    color: 'rgba(255,255,255, .25)'
   },
-  contentContainer: {
-    paddingTop: 30
+  updateTimeContainer: {
+    paddingTop: 8
   },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50
-  },
-  homeScreenFilename: {
-    marginVertical: 7
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)'
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center'
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3
-      },
-      android: {
-        elevation: 20
-      }
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center'
-  },
-  navigationFilename: {
-    marginTop: 5
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center'
-  },
-  helpLink: {
-    paddingVertical: 15
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7'
+  updateTimeText: {
+    color: 'rgba(255,255,255, .15)'
   }
 })

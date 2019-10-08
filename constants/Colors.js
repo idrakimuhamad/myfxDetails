@@ -1,4 +1,4 @@
-const tintColor = '#2f95dc';
+const tintColor = 'hsl(217, 71%, 53%)'
 
 export default {
   tintColor,
@@ -11,4 +11,6 @@ export default {
   warningText: '#666804',
   noticeBackground: tintColor,
   noticeText: '#fff',
-};
+  danger: 'hsl(348, 100%, 61%)',
+  success: 'hsl(141, 71%, 48%)'
+}
