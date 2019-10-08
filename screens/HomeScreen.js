@@ -13,12 +13,7 @@ export default function HomeScreen() {
         <View style={styles.container}>
           {!session ? (
             <View style={styles.centerLogin}>
-              <TouchableOpacity
-                onPress={() => {
-                  Alert.alert('login pressed')
-                  login()
-                }}
-                style={styles.loginButton}>
+              <TouchableOpacity onPress={login} style={styles.loginButton}>
                 <Text style={styles.loginButtonText}>Login</Text>
               </TouchableOpacity>
             </View>

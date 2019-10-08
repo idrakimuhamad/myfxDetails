@@ -60,18 +60,14 @@ export default function App(props) {
     }
   }
 
-  const handleLogin = async () => {
+  async function handleLogin() {
     console.log('Logging in...')
-    Alert.alert('handle login')
 
     const request = await apiContext.login('idrakimuhamad@gmail.com', 'atin2309')
 
     if (request.kind === 'ok') {
-      Alert.alert('Login OK')
       console.log(`Logged in... Session ${request.session}`)
       storeSession(request.session)
-    } else {
-      Alert.alert('Login not ok')
     }
   }
 
@@ -85,10 +81,6 @@ export default function App(props) {
       setSession('')
       removeSession()
     }
-  }
-
-  const doSomething = async () => {
-    Alert.alert('Do something')
   }
 
   useEffect(() => {

@@ -30,14 +30,13 @@ export default function AccountOpenTrade({
         console.log(` `)
         console.log(`=====Account ${name}: ${id}======`)
         console.log(`Trades retrieved...`)
-        console.log(request.trades)
         setTrades(request.trades)
       }
     }
   }
 
   const calculateTotalPL = () => {
-    if (!trades.length) return <Text style={styles.float}>0.00 {currency}</Text>
+    if (trades && !trades.length) return <Text style={styles.float}>0.00 {currency}</Text>
     const total = trades.reduce((m, trade) => m + trade.profit, 0)
     return (
       <Text
@@ -142,7 +141,12 @@ export default function AccountOpenTrade({
           </Text>
         </View>
         <View style={styles.updateTimeContainer}>
-          <Text style={styles.updateTimeText}>Updated {dayjs(lastUpdateDate).fromNow()}</Text>
+          <Text style={styles.updateTimeText}>
+            Updated{' '}
+            {dayjs(lastUpdateDate)
+              .add(dayjs().utcOffset(), 'minute')
+              .fromNow()}
+          </Text>
         </View>
       </View>
     </View>
