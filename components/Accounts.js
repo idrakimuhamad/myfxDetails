@@ -7,6 +7,7 @@ export default function Accounts({ api, session }) {
   const [accounts, setAccounts] = useState([])
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
+  let polling
 
   const retrieveAccounts = async () => {
     if (api) {
@@ -28,9 +29,26 @@ export default function Accounts({ api, session }) {
     retrieveAccounts()
   }
 
+  const handlePolling = () => {
+    console.log('Polling every 30 minutes')
+
+    if (polling) clearInterval(polling)
+
+    polling = setInterval(() => {
+      console.log('polling time...refreshing')
+      handleRefreshing()
+    }, 1000 * 60 * 30)
+  }
+
   useEffect(() => {
     handleRefreshing()
+    handlePolling()
+
+    return function clear() {
+      clearInterval(polling)
+    }
   }, [api, session])
+
   return (
     <View style={styles.mainContainer}>
       <Text style={styles.title}>Accounts</Text>
