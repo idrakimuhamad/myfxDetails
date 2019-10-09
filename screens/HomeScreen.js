@@ -1,21 +1,51 @@
 import * as WebBrowser from 'expo-web-browser'
-import React from 'react'
-import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react'
+import { TextInput, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import colors from '../constants/Colors'
 import { ApiContext } from '../services/api'
 import Accounts from '../components/Accounts'
+import Colors from '../constants/Colors'
 
 export default function HomeScreen() {
+  const [auth, setAuth] = useState({
+    username: '',
+    password: ''
+  })
+
+  const handleSetAuth = (text, type) => {
+    setAuth({ ...auth, [type]: text })
+  }
+
   return (
     <ApiContext.Consumer>
-      {({ session, login, logout, api }) => (
+      {({ session, sessionError, login, logout, api, loading }) => (
         <View style={styles.container}>
           {!session ? (
             <View style={styles.centerLogin}>
-              <TouchableOpacity onPress={login} style={styles.loginButton}>
-                <Text style={styles.loginButtonText}>Login</Text>
+              <TextInput
+                style={styles.input}
+                autoCompleteType="username"
+                placeholder="MyFxbook Username"
+                onChangeText={text => handleSetAuth(text, 'username')}
+                autoCapitalize="none"
+                value={auth.username}
+              />
+              <TextInput
+                style={styles.input}
+                autoCompleteType="password"
+                placeholder="MyFxbook Password"
+                onChangeText={text => handleSetAuth(text, 'password')}
+                value={auth.password}
+                autoCapitalize="none"
+                secureTextEntry
+              />
+              <TouchableOpacity onPress={() => login(auth)} style={styles.loginButton}>
+                <Text style={styles.loginButtonText}>{loading ? 'Loading...' : 'Login'}</Text>
               </TouchableOpacity>
+              {!!sessionError && (
+                <Text style={styles.errorText}>Unable to login. {sessionError}</Text>
+              )}
             </View>
           ) : (
             <Accounts api={api} session={session}></Accounts>
@@ -27,6 +57,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
           )}
+          <Text style={styles.version}>v.0.0.1</Text>
         </View>
       )}
     </ApiContext.Consumer>
@@ -43,12 +74,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#262B34'
   },
   centerLogin: {
-    width: '100%',
     flex: 1,
     paddingHorizontal: 24,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  input: {
+    width: Platform.isPad ? '50%' : '100%',
+    backgroundColor: 'white',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    height: 40,
+    marginBottom: 12
   },
   footerTab: {
     padding: 24,
@@ -57,12 +96,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   loginButton: {
+    width: Platform.isPad ? '50%' : '100%',
     paddingVertical: 12,
     paddingHorizontal: 24,
     backgroundColor: colors.tintColor,
     alignItems: 'center',
-    borderRadius: 4,
-    flex: 1
+    borderRadius: 4
   },
   loginButtonText: {
     color: 'white',
@@ -79,5 +118,16 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: 'white',
     fontSize: 14
+  },
+  version: {
+    textAlign: 'center',
+    paddingBottom: 16,
+    color: 'rgba(255,255,255, .1)'
+  },
+  errorText: {
+    paddingVertical: 12,
+    fontSize: 12,
+    textAlign: 'center',
+    color: Colors.danger
   }
 })

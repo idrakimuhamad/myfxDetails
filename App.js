@@ -16,6 +16,8 @@ export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false)
   const [apiContext, setApiContext] = useState(null)
   const [session, setSession] = useState('')
+  const [sessionError, setSessionError] = useState(null)
+  const [loading, setLoading] = useState(null)
 
   const setup = async () => {
     const env = new Api()
@@ -60,14 +62,25 @@ export default function App(props) {
     }
   }
 
-  async function handleLogin() {
+  async function handleLogin({ username, password }) {
+    setSessionError(null)
+    setLoading(true)
+
     console.log('Logging in...')
 
-    const request = await apiContext.login('idrakimuhamad@gmail.com', 'atin2309')
+    try {
+      const request = await apiContext.login(username, password)
 
-    if (request.kind === 'ok') {
-      console.log(`Logged in... Session ${request.session}`)
-      storeSession(request.session)
+      if (request.kind === 'ok') {
+        console.log(`Logged in... Session ${request.session}`)
+        storeSession(request.session)
+      } else {
+        throw new Error(request.message)
+      }
+    } catch (error) {
+      setSessionError(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -102,8 +115,10 @@ export default function App(props) {
         value={{
           api: apiContext,
           session: session,
+          sessionError: sessionError,
           login: handleLogin,
-          logout: handleLogout
+          logout: handleLogout,
+          loading: loading
         }}>
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}

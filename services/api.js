@@ -1,4 +1,5 @@
 import React, { createContext } from 'react'
+import { Alert } from 'react-native'
 import { create } from 'apisauce'
 
 const DEFAULT_API_CONFIG = {
@@ -41,14 +42,23 @@ export class Api {
    */
   async login(email, password) {
     // make the api call
-    const response = await this.apisauce.get(`/login.json?debug=1`, {
+    const params = {
       email,
       password
-    })
-    // const response = await this.apisauce.get(`/login.json?email=${email}&password=${password}`)
+    }
 
-    if (!response.ok) {
-      return { kind: 'error' }
+    // if (__DEV__) {
+    //   params.debug = 1
+    // }
+
+    const response = await this.apisauce.get(`/login.json`, params)
+
+    if (!response.ok || response.error || !response.data.session) {
+      return {
+        kind: 'error',
+        message:
+          (response.data && response.data.message) || response.message || 'No session received'
+      }
     }
 
     // transform the data into the format we are expecting
@@ -68,7 +78,7 @@ export class Api {
       session
     })
 
-    if (!response.ok) {
+    if (!response.ok || response.error) {
       return { kind: 'error' }
     }
 
@@ -84,13 +94,23 @@ export class Api {
    * Get all of accounts
    */
   async getAllAccounts(session) {
-    // make the api call
-    const response = await this.apisauce.get(`/get-my-accounts.json?debug=1`, {
+    const params = {
       session
-    })
+    }
 
-    if (!response.ok) {
-      return { kind: 'error' }
+    // if (__DEV__) {
+    //   params.debug = 1
+    // }
+
+    // make the api call
+    const response = await this.apisauce.get(`/get-my-accounts.json`, params)
+
+    if (!response.ok || response.error || !response.data.accounts.length) {
+      return {
+        kind: 'error',
+        message:
+          (response.data && response.data.message) || response.message || 'No accounts received'
+      }
     }
 
     // transform the data into the format we are expecting
@@ -107,12 +127,19 @@ export class Api {
    * @param {string} id AccountID
    */
   async getOpenTrades(session, id) {
-    // make the api call
-    const response = await this.apisauce.get(
-      `/get-open-trades.json?debug=1&session=${session}&id=${id}`
-    )
+    const params = {
+      session,
+      id
+    }
 
-    if (!response.ok) {
+    // if (__DEV__) {
+    //   params.debug = 1
+    // }
+
+    // make the api call
+    const response = await this.apisauce.get(`/get-open-trades.json`, params)
+
+    if (!response.ok || response.error) {
       return { kind: 'error' }
     }
 
@@ -132,12 +159,21 @@ export class Api {
    * @param {Date} end End date (yyyy-MM-dd)
    */
   async getWeekGain(session, id, start, end) {
-    // make the api call
-    const response = await this.apisauce.get(
-      `/get-gain.json?debug=1&session=${session}&id=${id}&start=${start}&end=${end}`
-    )
+    const params = {
+      session,
+      id,
+      start,
+      end
+    }
 
-    if (!response.ok) {
+    // if (__DEV__) {
+    //   params.debug = 1
+    // }
+
+    // make the api call
+    const response = await this.apisauce.get(`/get-gain.json`, params)
+
+    if (!response.ok || response.error) {
       return { kind: 'error' }
     }
 

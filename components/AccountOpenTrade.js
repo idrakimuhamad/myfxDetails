@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+import { Platform, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import dayjs from 'dayjs'
 import 'dayjs/locale/en-SG'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -76,7 +76,7 @@ export default function AccountOpenTrade({
   }, [session, id])
 
   return (
-    <View style={styles.accountCard}>
+    <TouchableOpacity style={styles.accountCard}>
       <View style={styles.accountCardInner}>
         <View
           style={styles.cardRow}
@@ -149,13 +149,15 @@ export default function AccountOpenTrade({
           </Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
   accountCard: {
-    paddingBottom: 12
+    paddingBottom: Platform.isPad ? 24 : 12,
+    paddingHorizontal: Platform.isPad ? 12 : 0,
+    width: Platform.isPad ? `${100 / 3}%` : '100%'
   },
   accountCardInner: {
     backgroundColor: 'rgba(255,255,255, .025)',
@@ -181,13 +183,14 @@ const styles = StyleSheet.create({
     flex: 0.5
   },
   balance: {
-    fontSize: 14,
+    fontSize: Platform.isPad ? (100 / 3 / 100) * 32 : 14,
     color: 'rgba(255,255,255, .25)'
   },
   updateTimeContainer: {
     paddingTop: 8
   },
   updateTimeText: {
+    fontSize: Platform.isPad ? (100 / 3 / 100) * 28 : 14,
     color: 'rgba(255,255,255, .15)'
   }
 })

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Text, ScrollView, StyleSheet, RefreshControl, View } from 'react-native'
+import { Platform, Text, ScrollView, StyleSheet, RefreshControl, View } from 'react-native'
 import AccountOpenTrade from './AccountOpenTrade'
+import Colors from '../constants/Colors'
 
 export default function Accounts({ api, session }) {
   const [accounts, setAccounts] = useState([])
   const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState('')
 
   const retrieveAccounts = async () => {
     if (api) {
@@ -13,6 +15,8 @@ export default function Accounts({ api, session }) {
       if (request.kind === 'ok') {
         console.log(`Account retrieved...`)
         setAccounts(request.accounts)
+      } else {
+        setError(request.message)
       }
 
       setRefreshing(false)
@@ -42,13 +46,18 @@ export default function Accounts({ api, session }) {
           />
         }>
         <View style={styles.accountContainer}>
-          {accounts.map(account => (
-            <AccountOpenTrade
-              key={account.id}
-              api={api}
-              session={session}
-              {...account}></AccountOpenTrade>
-          ))}
+          {!!error && (
+            <Text style={styles.errorText}>Unable to retrieve account info. {error}</Text>
+          )}
+          <View style={styles.accountFlex}>
+            {accounts.map(account => (
+              <AccountOpenTrade
+                key={account.id}
+                api={api}
+                session={session}
+                {...account}></AccountOpenTrade>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -72,5 +81,16 @@ const styles = StyleSheet.create({
   },
   accountContainer: {
     paddingHorizontal: 24
+  },
+  errorText: {
+    paddingVertical: 12,
+    fontSize: 12,
+    textAlign: 'center',
+    color: Colors.danger
+  },
+  accountFlex: {
+    flexDirection: Platform.isPad ? 'row' : 'column',
+    flexWrap: Platform.isPad ? 'wrap' : 'noWrap',
+    marginHorizontal: Platform.isPad ? -12 : 0
   }
 })
